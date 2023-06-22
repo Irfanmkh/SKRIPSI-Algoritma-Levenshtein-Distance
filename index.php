@@ -219,21 +219,31 @@
                         // Memproses setiap data dari tabel judul
                         while ($row = mysqli_fetch_assoc($result)) {
                             $judulBukuTokens = preprocess($row['judul']);
-                            $minDistance = PHP_INT_MAX;
-                            $closestToken = "";
-                            foreach ($judulBukuTokens as $judulBukuToken) {
-                                $distance = levenshtein_distance($keywordToken, $judulBukuToken);
-                                if ($distance < $minDistance) {
-                                    $minDistance = $distance;
-                                    $closestToken = $judulBukuToken;
+
+                            // Periksa apakah token keyword ada di dalam array judulBukuTokens
+                            if (in_array($keywordToken, $judulBukuTokens)) {
+                                $suggestions[] = $keywordToken;
+                                break; // Langsung keluar dari loop jika token sudah ada persis di database
+                            } else {
+                                $minDistance = PHP_INT_MAX;
+                                $closestToken = "";
+                                foreach ($judulBukuTokens as $judulBukuToken) {
+                                    $distance = levenshtein_distance($keywordToken, $judulBukuToken);
+                                    if ($distance < $minDistance) {
+                                        $minDistance = $distance;
+                                        $closestToken = $judulBukuToken;
+                                    }
+
+                                    if ($minDistance <= $threshold) {
+                                        $suggestions[$keywordToken] = $closestToken;
+                                    }
                                 }
-                            }
-                            if ($minDistance <= $threshold) {
-                                $suggestions[$keywordToken] = $closestToken;
                             }
                         }
                     }
                 }
+
+
                 $suggestion = array_unique($suggestions);
 
                 return $suggestion;
