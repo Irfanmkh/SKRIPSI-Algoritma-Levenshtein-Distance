@@ -3,5 +3,5 @@
 Tugas Akhir Kuliah (SKRIPSI)
 
 #### Requirement
-> web server
-> database
+1. Web Server
+2. Database
